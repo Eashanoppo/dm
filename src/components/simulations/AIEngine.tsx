@@ -38,8 +38,8 @@ export const AIEngine = () => {
       title="Bayesian X-Ray Scanner"
       formula={`\\log P(S|w) \\propto \\log P(S) + \\sum \\log P(w_i|S)`}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 mb-16">
-        <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-12 mb-16">
+        <div className="space-y-8 min-w-0">
 
           {/* Dynamic Input & Token Visualizer */}
           <GlassCard className="p-8 relative bg-white/40 overflow-hidden shadow-academic-md">
@@ -124,44 +124,66 @@ export const AIEngine = () => {
           </GlassCard>
 
           {/* Mathematical Tug-of-War (Log Space) */}
-          <GlassCard className="p-8 bg-white/40 shadow-academic-sm">
+          <GlassCard className="p-8 bg-white/40 shadow-academic-sm overflow-hidden">
               <h4 className="text-xs font-bold uppercase tracking-widest text-academic-muted mb-8 text-center">Evidence Tug-Of-War (Log-Space Scale)</h4>
               
               <div className="relative h-16 flex items-center mb-4">
-                  {/* The Scale Line */}
-                  <div className="absolute w-full h-[2px] bg-academic-border inset-y-1/2" />
-                  
-                  {/* Center zero line */}
-                  <div className="absolute h-10 w-[2px] bg-academic-text/30 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10" />
-                  
-                  {/* The shifting balance pointer */}
-                  <motion.div 
-                     className="absolute w-8 h-8 border-4 border-white rounded-full z-20 shadow-md flex items-center justify-center -translate-x-1/2 scale-110"
-                     style={{ backgroundColor: risk.color }}
-                     animate={{ left: `${Math.max(0, Math.min(100, 50 + (knownSteps.reduce((acc,s)=>acc+s.logLikelihoodRatio, 0) * 5)))}%` }}
-                     transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                  >
-                     <div className="w-2 h-2 rounded-full bg-white" />
-                  </motion.div>
+                  {(() => {
+                      const maxAbsSum = knownSteps.reduce((max, step, idx, arr) => {
+                          const sum = arr.slice(0, idx + 1).reduce((acc, s) => acc + s.logLikelihoodRatio, 0);
+                          return Math.max(max, Math.abs(sum));
+                      }, 0.1);
+                      const scale = Math.min(5, 45 / maxAbsSum);
+                      const currentSum = knownSteps.reduce((acc, s) => acc + s.logLikelihoodRatio, 0);
 
-                  {/* Individual Pull Vectors */}
-                  {knownSteps.map((step, i) => {
-                      const offset = step.logLikelihoodRatio > 0 ? 50 : 50 + (step.logLikelihoodRatio * 5);
-                      const width = Math.abs(step.logLikelihoodRatio * 5);
                       return (
-                         <div 
-                           key={i}
-                           className="absolute h-[5px] rounded-full z-0 opacity-50 mix-blend-multiply transition-all duration-500 origin-center"
-                           style={{
-                              left: `${Math.max(0, offset)}%`,
-                              width: `${Math.min(50, width)}%`,
-                              backgroundColor: step.logLikelihoodRatio > 0 ? "#9B2F00" : "#059669",
-                              top: "50%",
-                              transform: `translateY(-50%) translateY(${i % 2 === 0 ? '-10px' : '10px'})`
-                           }}
-                         />
+                          <>
+                              {/* The Scale Line */}
+                              <div className="absolute w-full h-[2px] bg-academic-border inset-y-1/2" />
+                              
+                              {/* Center zero line */}
+                              <div className="absolute h-10 w-[2px] bg-academic-text/30 left-1/2 -translate-y-1/2 -translate-x-1/2 z-10" />
+                              
+                              {/* The shifting balance pointer */}
+                              <motion.div 
+                                 className="absolute w-8 h-8 border-4 border-white rounded-full z-20 shadow-md flex items-center justify-center -translate-x-1/2 scale-110"
+                                 style={{ backgroundColor: risk.color }}
+                                 animate={{ left: `${50 + (currentSum * scale)}%` }}
+                                 transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                              >
+                                 <div className="w-2 h-2 rounded-full bg-white" />
+                              </motion.div>
+
+                              {/* Individual Pull Vectors */}
+                              {(() => {
+                                  let currentOffset = 50;
+                                  return knownSteps.map((step, i) => {
+                                      const llrScaled = step.logLikelihoodRatio * scale;
+                                      const start = currentOffset;
+                                      const end = currentOffset + llrScaled;
+                                      currentOffset = end;
+                                      
+                                      const left = Math.min(start, end);
+                                      const width = Math.abs(end - start);
+
+                                      return (
+                                          <div 
+                                            key={i}
+                                            className="absolute h-[5px] rounded-full z-0 opacity-80 mix-blend-multiply transition-all duration-500 origin-center"
+                                            style={{
+                                                left: `${left}%`,
+                                                width: `${width}%`,
+                                                backgroundColor: llrScaled > 0 ? "#9B2F00" : "#059669",
+                                                top: "50%",
+                                                transform: `translateY(-50%)`
+                                            }}
+                                          />
+                                      );
+                                  });
+                              })()}
+                          </>
                       );
-                  })}
+                  })()}
               </div>
               <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-academic-muted">
                   <span>← Safe Evidence (Ham)</span>
