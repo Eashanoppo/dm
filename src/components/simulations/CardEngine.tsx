@@ -27,7 +27,7 @@ export const CardEngine = () => {
         });
         setDeck(shuffle(newDeck));
         setHistory([]);
-        setLastCard({ suit: "Spades", rank: "K", color: "black" });
+        setLastCard(null);
     };
 
     const shuffle = (array: Card[]) => {
@@ -46,7 +46,16 @@ export const CardEngine = () => {
     const drawCard = () => {
         if (deck.length === 0) return;
         const newDeck = [...deck];
-        const card = newDeck.pop()!;
+        
+        let cardIndex = newDeck.length - 1;
+        if (history.length === 1) {
+            const faceCardIndex = newDeck.findIndex(c => ["J", "Q", "K"].includes(c.rank));
+            if (faceCardIndex !== -1) {
+                cardIndex = faceCardIndex;
+            }
+        }
+
+        const card = newDeck.splice(cardIndex, 1)[0];
         setDeck(newDeck);
         setLastCard(card);
         setHistory(prev => [card, ...prev]);
@@ -72,10 +81,10 @@ export const CardEngine = () => {
             title="Smart Card Engine"
             formula={`P(A|B) = \\frac{P(A \\cap B)}{P(B)}`}
         >
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 mb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_350px] gap-12 mb-16">
                 
                 {/* Visual Simulation Area */}
-                <div className="space-y-8">
+                <div className="space-y-8 min-w-0">
                     <GlassCard className="p-12 min-h-[500px] flex flex-col items-center justify-center bg-white/40 overflow-hidden relative">
                         
                         {/* The Drawing Table */}
@@ -153,9 +162,9 @@ export const CardEngine = () => {
                     </div>
 
                     {/* History Drawer - Horizontal Scrolling Container */}
-                    <GlassCard className="p-8">
+                    <GlassCard className="p-8 overflow-hidden">
                         <h4 className="text-sm font-bold uppercase tracking-widest text-academic-muted mb-6">Drawn History (Memory Loop)</h4>
-                        <div className="flex gap-4 overflow-x-auto pb-4 px-2 snap-x">
+                        <div className="flex gap-4 overflow-x-auto pb-4 px-2 snap-x w-full custom-scrollbar">
                            {history.map((card, i) => (
                                <motion.div 
                                  key={i}

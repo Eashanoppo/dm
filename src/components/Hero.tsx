@@ -41,7 +41,7 @@ export const Hero = () => {
                     <span className="text-secondary font-bold uppercase tracking-[0.3em] text-xs mb-4 block">Calculated Truth at Scale</span>
                     <h1 className="text-6xl md:text-8xl font-bold leading-[1.05] tracking-tight text-academic-text">
                         Probability <br />
-                        <span className="text-primary italic">From Coins to AI</span>
+                        <span className="text-primary">From Coins to AI</span>
                     </h1>
                 </motion.div>
 
