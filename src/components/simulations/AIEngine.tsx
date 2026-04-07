@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { GlassCard, SectionSection, InsightBox, TheoryBoard, MathText } from "../ui/AcademicUI";
 import { calculateAIDecision } from "@/lib/probability-utils";
@@ -34,6 +34,37 @@ export const AIEngine = () => {
     { l: "Law 3: Bayes' Law", v: "Updating belief with evidence: $P(H|E) = \\frac{P(E|H)P(H)}{P(E)}$. The core of all modern machine learning optimization." },
     { l: "The AI Matrix", v: "Intelligence is the recursive application of these three laws to reduce uncertainty in noise." }
   ];
+
+  // === Interactive Text Prediction State ===
+  const [userInput, setUserInput] = useState("The sky is");
+
+  // Predefined context → next-word probability map
+  const PREDICTION_MAP: Record<string, { word: string; prob: number }[]> = {
+    "the sky is":      [{ word: "blue", prob: 0.85 }, { word: "clear", prob: 0.08 }, { word: "green", prob: 0.04 }, { word: "red", prob: 0.02 }, { word: "dark", prob: 0.01 }],
+    "the weather is":  [{ word: "cold", prob: 0.72 }, { word: "warm", prob: 0.15 }, { word: "rainy", prob: 0.08 }, { word: "sunny", prob: 0.04 }, { word: "hot", prob: 0.01 }],
+    "i love":          [{ word: "you", prob: 0.60 }, { word: "math", prob: 0.18 }, { word: "cats", prob: 0.12 }, { word: "food", prob: 0.07 }, { word: "art", prob: 0.03 }],
+    "machine learning": [{ word: "is", prob: 0.55 }, { word: "models", prob: 0.20 }, { word: "algorithms", prob: 0.14 }, { word: "data", prob: 0.08 }, { word: "research", prob: 0.03 }],
+    "probability is":   [{ word: "key", prob: 0.65 }, { word: "important", prob: 0.20 }, { word: "fun", prob: 0.09 }, { word: "math", prob: 0.04 }, { word: "hard", prob: 0.02 }],
+    "the cat sat on":   [{ word: "the", prob: 0.88 }, { word: "a", prob: 0.07 }, { word: "my", prob: 0.03 }, { word: "that", prob: 0.02 }],
+    "default":          [{ word: "the", prob: 0.45 }, { word: "a", prob: 0.28 }, { word: "is", prob: 0.15 }, { word: "not", prob: 0.08 }, { word: "and", prob: 0.04 }],
+  };
+
+  const getPredictions = (text: string) => {
+    const key = text.trim().toLowerCase();
+    for (const [ctx, preds] of Object.entries(PREDICTION_MAP)) {
+      if (ctx !== "default" && key.endsWith(ctx)) return { context: ctx, preds };
+    }
+    // Try partial match on last 3 words
+    const words = key.split(/\s+/).slice(-3).join(" ");
+    if (PREDICTION_MAP[words]) return { context: words, preds: PREDICTION_MAP[words] };
+    return { context: "", preds: PREDICTION_MAP["default"] };
+  };
+
+  const { context: matchedCtx, preds: predictions } = useMemo(
+    () => getPredictions(userInput),
+    [userInput]
+  );
+  const topWord = predictions[0];
 
   return (
     <SectionSection
@@ -145,9 +176,9 @@ export const AIEngine = () => {
              </div>
           </GlassCard>
 
-          {/* AI Probability Example Card */}
+          {/* AI Probability Example Card — Interactive */}
           <GlassCard className="p-8 bg-white/60 border border-academic-border">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">🧠</span>
               <h3 className="text-sm font-bold uppercase tracking-widest text-academic-text">
                 Everything Starts With Probabilities
@@ -158,38 +189,71 @@ export const AIEngine = () => {
             </p>
 
             <div className="bg-[#1C1B17] rounded-xl p-6 font-mono text-sm">
-              <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Example · Text Prediction AI</p>
-              <div className="space-y-2 mb-5">
-                <p className="text-white/60 text-xs">Input:</p>
-                <p className="text-secondary-gold font-bold text-base">"The sky is ___"</p>
+              <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Live Demo · Text Prediction AI</p>
+
+              {/* User Input */}
+              <div className="mb-5">
+                <p className="text-white/40 text-xs mb-2">Your Input:</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    placeholder="Type a phrase…"
+                    className="flex-1 bg-white/10 text-secondary-gold font-bold text-sm px-4 py-2.5 rounded-lg border border-white/10 focus:border-secondary-gold/50 focus:outline-none focus:ring-1 focus:ring-secondary-gold/30 placeholder-white/20 transition-all"
+                    spellCheck={false}
+                  />
+                  <span className="text-white/20 text-lg font-bold animate-pulse">___</span>
+                </div>
+                {matchedCtx && (
+                  <p className="text-white/30 text-[10px] mt-2">
+                    Matched context: <span className="text-secondary-gold/60">"{matchedCtx}"</span>
+                  </p>
+                )}
               </div>
-              <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Model Calculates:</p>
+
+              {/* Probability Bars */}
+              <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Model Calculates Next Word P:</p>
               <div className="space-y-3">
-                {[
-                  { word: "blue",  prob: 0.85, top: true },
-                  { word: "green", prob: 0.05, top: false },
-                  { word: "red",   prob: 0.02, top: false },
-                ].map(({ word, prob, top }) => (
-                  <div key={word} className="flex items-center gap-3">
-                    <span className={`w-14 text-right text-xs font-bold ${top ? "text-secondary-gold" : "text-white/50"}`}>
-                      P({word})
-                    </span>
-                    <span className="text-white/30 text-xs">=</span>
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-700 ${top ? "bg-secondary-gold" : "bg-white/20"}`}
-                        style={{ width: `${prob * 100}%` }}
-                      />
-                    </div>
-                    <span className={`text-xs font-bold w-10 ${top ? "text-secondary-gold" : "text-white/40"}`}>
-                      {(prob * 100).toFixed(0)}%
-                    </span>
-                    {top && <span className="text-[10px] text-secondary-gold font-bold uppercase tracking-widest">← Picks This</span>}
-                  </div>
-                ))}
+                {predictions.map(({ word, prob }, i) => {
+                  const isTop = i === 0;
+                  return (
+                    <motion.div
+                      key={word}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.06 }}
+                      className="flex items-center gap-3"
+                    >
+                      <span className={`w-20 text-right text-xs font-bold shrink-0 ${isTop ? "text-secondary-gold" : "text-white/50"}`}>
+                        P({word})
+                      </span>
+                      <span className="text-white/30 text-xs">=</span>
+                      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                          className={`h-full rounded-full ${isTop ? "bg-secondary-gold" : "bg-white/20"}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${prob * 100}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut", delay: i * 0.06 }}
+                        />
+                      </div>
+                      <span className={`text-xs font-bold w-10 text-right shrink-0 ${isTop ? "text-secondary-gold" : "text-white/40"}`}>
+                        {(prob * 100).toFixed(0)}%
+                      </span>
+                      {isTop && (
+                        <span className="text-[10px] text-secondary-gold font-bold uppercase tracking-widest shrink-0">
+                          ← Picks
+                        </span>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </div>
+
+              {/* Verdict */}
               <p className="text-white/30 text-xs mt-5 pt-4 border-t border-white/10">
-                👉 It picks "blue" because it has the highest probability — <span className="text-secondary-gold">argmax P(output | input)</span>
+                👉 Picks <span className="text-secondary-gold font-bold">"{topWord.word}"</span> — highest probability via{" "}
+                <span className="text-secondary-gold">argmax P(output | input)</span>
               </p>
             </div>
           </GlassCard>
