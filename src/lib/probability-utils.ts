@@ -60,6 +60,36 @@ export const calculateBayes = (pA: number, pB_given_A: number, pB_given_notA: nu
   return { pA_given_B, pB };
 };
 
+/**
+ * AI Decision Logic (3-Law Fusion)
+ * 1. Addition Law: Combining sensor inputs (OR logic)
+ * 2. Multiplication Law: Joint probability of success (AND logic)
+ * 3. Bayes' Law: Updating confidence based on observation
+ */
+export const calculateAIDecision = (
+  inputA: number, 
+  inputB: number, 
+  overlap: number,
+  stepA: number,
+  stepB: number,
+  prior: number,
+  evidenceIfTrue: number,
+  evidenceIfFalse: number
+) => {
+  // Law 1: Addition (Fusion)
+  const pOverlap = (overlap / 100) * Math.min(inputA, inputB);
+  const pFusion = inputA + inputB - pOverlap;
+  
+  // Law 2: Multiplication (Chain)
+  const pChain = stepA * stepB;
+  
+  // Law 3: Bayes (Inference)
+  const { pA_given_B: pFinal } = calculateBayes(prior, evidenceIfTrue, evidenceIfFalse);
+  
+  return { pFusion, pChain, pFinal };
+};
+
+
 // === ADVANCED NAIVE BAYES ENGINE ===
 
 export type WordEvidence = {

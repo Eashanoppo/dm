@@ -139,18 +139,13 @@ export const VennEngine = () => {
 
                    {/* Interaction Highlights */}
                    
-                   {/* 1. Intersection A & B & C */}
-                   <motion.circle 
-                      cx={centers.A.x} cy={centers.A.y} r={pA * 100} 
-                      className={op === "Intersection" ? "fill-secondary-gold/80" : "fill-transparent"}
-                      clipPath="url(#circleB)"
-                      style={{ clipPath: "url(#circleB) url(#circleC)" }} // Experimental support check, usually nested
-                   />
-                   {/* Fallback for intersection via paths if needed, but lets use composite logic */}
+                   {/* 1. Intersection A ∩ B ∩ C — triple-nested clipPath for true center-only highlight */}
                    {op === "Intersection" && (
                        <g clipPath="url(#circleA)">
                            <g clipPath="url(#circleB)">
-                               <circle cx={centers.C.x} cy={centers.C.y} r={pC * 100} className="fill-secondary-gold shadow-2xl" />
+                               <g clipPath="url(#circleC)">
+                                   <rect x="0" y="0" width="400" height="400" fill="#D4A017" opacity="0.85" />
+                               </g>
                            </g>
                        </g>
                    )}
