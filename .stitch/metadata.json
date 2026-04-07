@@ -1,0 +1,30 @@
+{
+  "projectId": "17547764077097519554",
+  "title": "Probability Lab — Interactive Education Site",
+  "screens": {
+    "index": {
+      "id": "a532df8a60ec4c1caff3a8d2ee70c121",
+      "name": "projects/17547764077097519554/screens/a532df8a60ec4c1caff3a8d2ee70c121"
+    },
+    "speaker1": {
+      "id": "a8cb0eca3ce34b7cb406582a8d7b7d72",
+      "name": "projects/17547764077097519554/screens/a8cb0eca3ce34b7cb406582a8d7b7d72"
+    },
+    "speaker2": {
+      "id": "e705216bf240481292d6379dea17cfa8",
+      "name": "projects/17547764077097519554/screens/e705216bf240481292d6379dea17cfa8"
+    },
+    "speaker3": {
+      "id": "e064a76b529946439cc12f04c4966b32",
+      "name": "projects/17547764077097519554/screens/e064a76b529946439cc12f04c4966b32"
+    },
+    "speaker4": {
+      "id": "8e4e8bed065a4cd38496398a6c693801",
+      "name": "projects/17547764077097519554/screens/8e4e8bed065a4cd38496398a6c693801"
+    },
+    "speaker5": {
+      "id": "f0f4eb3687f24db8b72e6a6918a8e269",
+      "name": "projects/17547764077097519554/screens/f0f4eb3687f24db8b72e6a6918a8e269"
+    }
+  }
+}

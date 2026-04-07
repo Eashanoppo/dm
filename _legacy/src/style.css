@@ -1,0 +1,143 @@
+/* === Light Academic Premium Palette (Ivory Archive) === */
+:root {
+  --color-bg:        #FEF9F1;                    /* off-white warm paper foundation */
+  --color-bg-grad:   linear-gradient(135deg, #FEF9F1 0%, #F1ECE4 100%); /* body gradient */
+  --color-surface:   rgba(255, 255, 255, 0.60);  /* glassmorphism card (white glass) */
+  --color-surface-el:rgba(255, 255, 255, 0.85);  /* higher elevation card filler */
+  --color-primary:   #9B2F00;                    /* sophisticated Burnt Orange — core CTAs */
+  --color-secondary: #755B00;                    /* refined Gold — academic accents / indicators */
+  --color-text:      #1D1C17;                    /* near-black editorial authority text */
+  --color-muted:     #59413A;                    /* secondary/muted text font */
+  --color-border:    rgba(141, 113, 104, 0.12);  /* subtle hairline borders */
+  --color-glow-gold: rgba(224, 184, 74, 0.18);   /* warm gold diffusion glow */
+  --color-glow-org:  rgba(194, 65, 12, 0.12);    /* burnt orange interaction glow */
+  
+  /* Gradation */
+  --grad-primary: linear-gradient(135deg, #9B2F00 0%, #C2410C 100%);
+  --grad-gold: linear-gradient(135deg, #755B00 0%, #E0B84A 100%);
+
+  /* === Typography === */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Lora', 'Georgia', serif;        /* for math/academic blocks */
+
+  /* === Spacing & Shape === */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  
+  --shadow-sm: 0 4px 16px rgba(89, 65, 58, 0.04);
+  --shadow-md: 0 12px 32px rgba(89, 65, 58, 0.06);
+  --shadow-lg: 0 20px 48px rgba(89, 65, 58, 0.08);
+
+  /* === Transitions === */
+  --ease-base: cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-time: 0.3s;
+}
+
+/* === Global Resets === */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-grad);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* === Layout Blocks === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section {
+  padding: 6rem 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--ease-base), transform 0.8s var(--ease-base);
+}
+
+section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === UI Components === */
+
+/* Glassmorphism Card (Ivory Archive Style) */
+.glass-card {
+  background: var(--color-surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--trans-time) var(--ease-base), box-shadow var(--trans-time) var(--ease-base);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Formula Pill (Refined Gold) */
+.math-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(224, 184, 74, 0.08);
+  border: 1px solid rgba(224, 184, 74, 0.3);
+  border-radius: 50px;
+  font-family: var(--font-serif);
+  color: var(--color-text);
+  font-size: 1.1rem;
+}
+
+/* Insight Box (Gold Accent) */
+.insight-box {
+  border-left: 4px solid var(--color-secondary);
+  background: rgba(224, 184, 74, 0.05);
+  padding: 1.5rem 2rem;
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  margin-top: 2rem;
+  font-style: italic;
+  font-family: var(--font-serif);
+}
+
+/* Primary Button (Burnt Orange Gradient) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2.5rem;
+  background: var(--grad-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-base), box-shadow 0.2s var(--ease-base);
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px var(--color-glow-org);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
