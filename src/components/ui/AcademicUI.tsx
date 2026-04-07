@@ -269,22 +269,57 @@ export const CoinFace3D = ({ face, className, size = "md", ...props }: { face: "
 // PlayingCard: CSS-based playing card visual
 export const PlayingCard = ({ suit, rank, color, className }: { suit: string; rank: string; color: string; className?: string }) => {
   const suitIcon = suit === "Hearts" ? "♥" : suit === "Diamonds" ? "♦" : suit === "Clubs" ? "♣" : "♠";
+  const isFace = ["J", "Q", "K"].includes(rank);
+  const faceSymbol = rank === "K" ? "♚" : rank === "Q" ? "♛" : "♝";
+
   return (
     <div className={cn(
-      "w-32 h-44 bg-white border-2 border-academic-border rounded-xl flex flex-col p-3 shadow-academic-md hover:scale-105 transition-all overflow-hidden",
-      color === "red" ? "text-primary border-primary/10" : "text-academic-text border-academic-border",
+      "w-32 h-44 bg-white border-2 border-academic-border rounded-xl shadow-academic-md hover:scale-105 transition-all overflow-hidden relative select-none",
+      color === "red" ? "text-primary border-primary/20" : "text-academic-text border-academic-border",
       className
     )}>
-      <div className="flex flex-col leading-none">
-        <span className="text-2xl font-bold font-serif">{rank}</span>
-        <span className="text-xl">{suitIcon}</span>
+      {/* Top Left Indice */}
+      <div className="absolute top-2 left-2 flex flex-col items-center leading-none">
+        <span className="text-[22px] font-bold font-serif leading-none">{rank}</span>
+        <span className="text-[16px] leading-none mt-1">{suitIcon}</span>
       </div>
-      <div className="flex-1 flex items-center justify-center text-5xl">
-        {suitIcon}
+      
+      {/* Center content */}
+      <div className="absolute inset-0 px-[32px] py-[28px] pointer-events-none flex items-center justify-center">
+        {rank === "K" ? (
+           <div className="w-full h-full border-[1.5px] border-current/60 rounded-[4px] relative flex flex-col bg-current/[0.04] overflow-hidden shadow-inner">
+               <img src="/king-face.png" alt="King" className="w-full h-1/2 object-cover object-top mix-blend-multiply opacity-90" />
+               <img src="/king-face.png" alt="King" className="w-full h-1/2 object-cover object-top rotate-180 mix-blend-multiply opacity-90" />
+               <div className="absolute w-full h-px bg-current/20 top-1/2 -translate-y-1/2" />
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-[2px] border border-current/20 shadow-sm flex items-center justify-center">
+                   <span className="text-[18px] leading-none block w-5 h-5 text-center flex items-center justify-center">{suitIcon}</span>
+               </div>
+           </div>
+        ) : isFace ? (
+           <div className="w-full h-full border-2 border-current/40 rounded-[4px] relative flex flex-col items-center justify-center bg-current/[0.04] overflow-hidden shadow-inner">
+               <div className="absolute w-full h-px bg-current/20 top-1/2 -translate-y-1/2" />
+               
+               <div className="absolute top-1 flex flex-col items-center">
+                  <span className="text-[34px] leading-none opacity-80">{faceSymbol}</span>
+               </div>
+               
+               <div className="absolute bottom-1 flex flex-col items-center rotate-180">
+                  <span className="text-[34px] leading-none opacity-80">{faceSymbol}</span>
+               </div>
+               
+               <div className="z-10 bg-white rounded-full p-[2px] border border-current/20 shadow-sm flex items-center justify-center">
+                   <span className="text-[18px] leading-none block w-5 h-5 text-center flex items-center justify-center">{suitIcon}</span>
+               </div>
+           </div>
+        ) : (
+           <span className="text-[64px]">{suitIcon}</span>
+        )}
       </div>
-      <div className="flex flex-col leading-none rotate-180">
-        <span className="text-2xl font-bold font-serif">{rank}</span>
-        <span className="text-xl">{suitIcon}</span>
+
+      {/* Bottom Right Indice */}
+      <div className="absolute bottom-2 right-2 flex flex-col items-center leading-none rotate-180">
+        <span className="text-[22px] font-bold font-serif leading-none">{rank}</span>
+        <span className="text-[16px] leading-none mt-1">{suitIcon}</span>
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ export const CardEngine = () => {
         });
         setDeck(shuffle(newDeck));
         setHistory([]);
-        setLastCard(null);
+        setLastCard({ suit: "Spades", rank: "K", color: "black" });
     };
 
     const shuffle = (array: Card[]) => {

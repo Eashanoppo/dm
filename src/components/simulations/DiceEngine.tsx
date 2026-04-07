@@ -94,16 +94,26 @@ export const DiceEngine = () => {
                    {[0, 1].map((i) => (
                       <motion.div
                         key={i}
-                        animate={{ 
-                            rotateX: isRolling ? [0, 90, 180, 270, 360] : 0,
-                            rotateY: isRolling ? [0, 90, 180, 270, 360] : 0,
-                            y: isRolling ? [0, -40, 0] : 0,
-                            scale: isRolling ? [1, 1.2, 1] : 1
-                        }}
+                        animate={
+                            isRolling 
+                            ? {
+                                rotateX: [0, 360, 720],
+                                rotateY: [0, 360, 720],
+                                rotateZ: [0, 180, 360],
+                                y: [0, -80, 0, -30, 0],
+                                scale: [1, 1.2, 1, 1.1, 1]
+                            }
+                            : {
+                                rotateX: 0,
+                                rotateY: 0,
+                                rotateZ: 0,
+                                y: 0,
+                                scale: 1
+                            }
+                        }
                         transition={{ 
-                           duration: 0.4, 
-                           repeat: isRolling ? Infinity : 0,
-                           ease: "linear"
+                           duration: isRolling ? 0.8 : 0, 
+                           ease: isRolling ? "easeOut" : "linear"
                         }}
                       >
                          <DiceFace value={rolls[i]} size="lg" className="shadow-2xl" />
