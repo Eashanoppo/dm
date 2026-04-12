@@ -1,9 +1,23 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard, SectionSection, InsightBox, TheoryBoard, MathText } from "../ui/AcademicUI";
 import { calculateAIDecision } from "@/lib/probability-utils";
+
+// ── Speaker 5 Speech ─────────────────────────────────────────────────────────
+export const SPEAKER_5_SPEECH = {
+  name: "Speaker 5",
+  topic: "Artificial Intelligence & Probability",
+  teaser: "Every large language model, every image classifier, every self-driving car perception system is, at its mathematical core, a machine for computing one thing: a probability distribution over possible next states.",
+  points: [
+    "WHAT AI ACTUALLY DOES: When GPT-4 generates a response, it does not 'understand' language in any philosophical sense. It computes P(next_token | all_previous_tokens) — the probability distribution over its entire vocabulary — and samples from it. The illusion of intelligence emerges from doing this at billion-parameter scale.",
+    "THE ARGMAX DECISION RULE: Most deterministic predictions use argmax — pick the output with the highest probability. ŷ = argmax P(output | input). This is the same rule your spam filter uses, the same rule a weather model uses, and the same rule a chess engine uses to evaluate positions.",
+    "SENSOR FUSION (ADDITION LAW): Autonomous vehicles combine data from cameras, LIDAR, radar, and GPS to form a unified world model. The Addition Rule governs how overlapping probability estimates from multiple sensors are merged: P(A∪B) = P(A) + P(B) − P(A∩B). No single sensor is trusted alone.",
+    "BAYES' UPDATING: The backbone of modern machine learning is iterative belief revision. At training time, a model updates its internal weights to increase the probability of observed outputs given inputs. At inference time, it applies those learned priors to new evidence. This is gradient-descent Bayesian inference — computed at internet scale.",
+  ],
+  formula: "\\hat{y} = \\arg\\max P(\\text{output} | \\text{input})",
+};
 
 export const AIEngine = () => {
   // --- Stage 1: Addition Law (Sensor Fusion) ---
@@ -37,16 +51,28 @@ export const AIEngine = () => {
 
   // === Interactive Text Prediction State ===
   const [userInput, setUserInput] = useState("The sky is");
+  const [speechOpen, setSpeechOpen] = useState(false);
 
-  // Predefined context → next-word probability map
+  // Suggestions quick-picks (from math/Section5AI)
+  const SUGGESTIONS = [
+    "The sky is", "The weather is", "The moon shines",
+    "I will", "Probability is", "It will rain",
+    "Machine learning is", "Every day I", "The coin will", "Students who study",
+  ];
+
+  // Expanded 10-entry prediction model (merged from math/Section5AI WORD_MODEL)
   const PREDICTION_MAP: Record<string, { word: string; prob: number }[]> = {
-    "the sky is":      [{ word: "blue", prob: 0.85 }, { word: "clear", prob: 0.08 }, { word: "green", prob: 0.04 }, { word: "red", prob: 0.02 }, { word: "dark", prob: 0.01 }],
-    "the weather is":  [{ word: "cold", prob: 0.72 }, { word: "warm", prob: 0.15 }, { word: "rainy", prob: 0.08 }, { word: "sunny", prob: 0.04 }, { word: "hot", prob: 0.01 }],
-    "i love":          [{ word: "you", prob: 0.60 }, { word: "math", prob: 0.18 }, { word: "cats", prob: 0.12 }, { word: "food", prob: 0.07 }, { word: "art", prob: 0.03 }],
-    "machine learning": [{ word: "is", prob: 0.55 }, { word: "models", prob: 0.20 }, { word: "algorithms", prob: 0.14 }, { word: "data", prob: 0.08 }, { word: "research", prob: 0.03 }],
-    "probability is":   [{ word: "key", prob: 0.65 }, { word: "important", prob: 0.20 }, { word: "fun", prob: 0.09 }, { word: "math", prob: 0.04 }, { word: "hard", prob: 0.02 }],
-    "the cat sat on":   [{ word: "the", prob: 0.88 }, { word: "a", prob: 0.07 }, { word: "my", prob: 0.03 }, { word: "that", prob: 0.02 }],
-    "default":          [{ word: "the", prob: 0.45 }, { word: "a", prob: 0.28 }, { word: "is", prob: 0.15 }, { word: "not", prob: 0.08 }, { word: "and", prob: 0.04 }],
+    "the sky is":        [{ word: "blue", prob: 0.85 }, { word: "clear", prob: 0.08 }, { word: "green", prob: 0.04 }, { word: "red", prob: 0.02 }, { word: "dark", prob: 0.01 }],
+    "the weather is":    [{ word: "hot", prob: 0.45 }, { word: "cold", prob: 0.30 }, { word: "nice", prob: 0.12 }, { word: "awful", prob: 0.08 }, { word: "perfect", prob: 0.05 }],
+    "the moon shines":   [{ word: "bright", prob: 0.50 }, { word: "beautifully", prob: 0.25 }, { word: "softly", prob: 0.15 }, { word: "at", prob: 0.07 }, { word: "dimly", prob: 0.03 }],
+    "i will":            [{ word: "go", prob: 0.35 }, { word: "try", prob: 0.28 }, { word: "be", prob: 0.20 }, { word: "not", prob: 0.10 }, { word: "help", prob: 0.07 }],
+    "probability is":    [{ word: "important", prob: 0.40 }, { word: "used", prob: 0.28 }, { word: "key", prob: 0.18 }, { word: "fundamental", prob: 0.09 }, { word: "beautiful", prob: 0.05 }],
+    "it will rain":      [{ word: "tomorrow", prob: 0.45 }, { word: "today", prob: 0.30 }, { word: "soon", prob: 0.15 }, { word: "again", prob: 0.07 }, { word: "heavily", prob: 0.03 }],
+    "machine learning is": [{ word: "powerful", prob: 0.42 }, { word: "cool", prob: 0.25 }, { word: "complex", prob: 0.18 }, { word: "changing", prob: 0.10 }, { word: "overrated", prob: 0.05 }],
+    "every day i":       [{ word: "wake", prob: 0.38 }, { word: "try", prob: 0.26 }, { word: "think", prob: 0.18 }, { word: "learn", prob: 0.12 }, { word: "work", prob: 0.06 }],
+    "the coin will":     [{ word: "land", prob: 0.55 }, { word: "flip", prob: 0.25 }, { word: "show", prob: 0.12 }, { word: "fall", prob: 0.05 }, { word: "spin", prob: 0.03 }],
+    "students who study": [{ word: "hard", prob: 0.60 }, { word: "daily", prob: 0.22 }, { word: "consistently", prob: 0.12 }, { word: "together", prob: 0.04 }, { word: "regularly", prob: 0.02 }],
+    "default":           [{ word: "the", prob: 0.45 }, { word: "a", prob: 0.28 }, { word: "is", prob: 0.15 }, { word: "not", prob: 0.08 }, { word: "and", prob: 0.04 }],
   };
 
   const getPredictions = (text: string) => {
@@ -66,14 +92,55 @@ export const AIEngine = () => {
   );
   const topWord = predictions[0];
 
+  const handleAcceptWord = (word: string) => {
+    setUserInput((prev) => prev.trim() + " " + word);
+  };
+
   return (
     <SectionSection
       id="speaker5"
       speaker="5"
-      label="Artificial Intelligence"
+      label={SPEAKER_5_SPEECH.topic}
       title="Probability Logic Matrix"
-      formula={`\\text{Decision} = P(H|E) \\cdot (P(A \\cup B) \\cap P(S_1 \\cap S_2))`}
+      formula={SPEAKER_5_SPEECH.formula}
     >
+      {/* Speech Panel */}
+      <div className="mb-12">
+        <button
+          onClick={() => setSpeechOpen(!speechOpen)}
+          className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-4"
+        >
+          <span className={`transition-transform duration-300 ${speechOpen ? "rotate-90" : ""}`}>▶</span>
+          {SPEAKER_5_SPEECH.name} — "{SPEAKER_5_SPEECH.teaser.slice(0, 60)}…"
+        </button>
+        <AnimatePresence>
+          {speechOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <GlassCard className="p-8 border-l-4 border-secondary mb-6">
+                <p className="text-academic-muted text-sm italic font-serif leading-relaxed mb-6">
+                  "{SPEAKER_5_SPEECH.teaser}"
+                </p>
+                <div className="space-y-4">
+                  {SPEAKER_5_SPEECH.points.map((pt, i) => (
+                    <div key={i} className="flex gap-4">
+                      <span className="text-secondary font-bold font-mono text-xs mt-1 shrink-0">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="text-sm leading-relaxed text-academic-muted">{pt}</p>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 mb-16">
         <div className="space-y-12">
           
@@ -184,9 +251,25 @@ export const AIEngine = () => {
                 Everything Starts With Probabilities
               </h3>
             </div>
-            <p className="text-academic-muted text-sm leading-relaxed mb-6 font-serif">
+            <p className="text-academic-muted text-sm leading-relaxed mb-4 font-serif">
               At the core, AI models estimate: <span className="italic">"Given this input, what is the probability of each possible output?"</span>
             </p>
+
+            {/* Suggestion pills */}
+            <div className="mb-5">
+              <p className="text-[10px] uppercase tracking-widest font-bold text-academic-muted mb-2">// Try these phrases:</p>
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setUserInput(s)}
+                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border-2 border-academic-border bg-white/60 text-academic-muted hover:border-secondary hover:text-secondary transition-all"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="bg-[#1C1B17] rounded-xl p-6 font-mono text-sm">
               <p className="text-white/40 text-xs uppercase tracking-widest mb-3">Live Demo · Text Prediction AI</p>
@@ -250,11 +333,19 @@ export const AIEngine = () => {
                 })}
               </div>
 
-              {/* Verdict */}
-              <p className="text-white/30 text-xs mt-5 pt-4 border-t border-white/10">
-                👉 Picks <span className="text-secondary-gold font-bold">"{topWord.word}"</span> — highest probability via{" "}
-                <span className="text-secondary-gold">argmax P(output | input)</span>
-              </p>
+              {/* Verdict + Accept button */}
+              <div className="mt-5 pt-4 border-t border-white/10">
+                <p className="text-white/30 text-xs mb-3">
+                  👉 Picks <span className="text-secondary-gold font-bold">"{topWord.word}"</span> — highest probability via{" "}
+                  <span className="text-secondary-gold">argmax P(output | input)</span>
+                </p>
+                <button
+                  onClick={() => handleAcceptWord(topWord.word)}
+                  className="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-secondary-gold text-black hover:bg-secondary-gold/80 transition-all"
+                >
+                  ✓ Accept "{topWord.word}"
+                </button>
+              </div>
             </div>
           </GlassCard>
 

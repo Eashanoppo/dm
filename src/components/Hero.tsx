@@ -41,7 +41,7 @@ export const Hero = () => {
                     <span className="text-secondary font-bold uppercase tracking-[0.3em] text-xs mb-4 block">Calculated Truth at Scale</span>
                     <h1 className="text-6xl md:text-8xl font-bold leading-[1.05] tracking-tight text-academic-text">
                         Probability <br />
-                        <span className="text-primary">From Coins to AI</span>
+                        <span className="text-primary">In The Real World</span>
                     </h1>
                 </motion.div>
 
@@ -86,13 +86,14 @@ export const Hero = () => {
                     </button>
                 </motion.div>
 
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-24">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-24">
                    {[
-                      { l: "F", label: "Fundamental", id: "speaker1" },
-                      { l: "C", label: "Coins", id: "speaker2" },
-                      { l: "D", label: "Dice", id: "speaker3" },
-                      { l: "K", label: "Cards", id: "speaker4" },
-                      { l: "A", label: "AI", id: "speaker5" },
+                   { l: "P", label: "Intro",       id: "sim-slider"    },
+                      { l: "F", label: "Venn",        id: "speaker1"      },
+                      { l: "R", label: "Real World",  id: "sim-realworld" },
+                      { l: "T", label: "Tech & AI",   id: "sim-tech"      },
+                      { l: "L", label: "Lottery",     id: "sim-lottery"   },
+                      { l: "A", label: "AI Engine",   id: "speaker5"      },
                    ].map((item, i) => (
                        <motion.div
                           key={i}

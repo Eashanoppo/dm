@@ -1,8 +1,22 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { SectionSection, TheoryBoard, InsightBox, MathText } from "../ui/AcademicUI";
+import { motion, AnimatePresence } from "framer-motion";
+import { SectionSection, TheoryBoard, InsightBox, MathText, GlassCard } from "../ui/AcademicUI";
+
+// ── Speaker 1 Speech ─────────────────────────────────────────────────────────
+export const SPEAKER_1_SPEECH = {
+  name: "Speaker 1",
+  topic: "The Logic of Sets",
+  teaser: "Before we can calculate the probability of a car crash or a stock market collapse, we must understand the geography of logic itself: the Venn diagram.",
+  points: [
+    "THE UNIVERSE OF EVENTS: Every probability problem starts with a Sample Space — the collection of all possible outcomes. A Venn diagram is a map of that space, where each circle represent a set of outcomes that share a property.",
+    "THE ADDITION RULE: The most common mistake in probability is double-counting. If event A has a 70% chance and event B has a 60% chance, the chance of 'A or B' isn't 130%. We must subtract the overlap (A ∩ B) to find the truth.",
+    "INCLUSION-EXCLUSION: For three sets, the math gets beautiful and complex. We add the individuals, subtract the pairs, and add back the triple-intersection that we subtracted one too many times. This is the bedrock of combinatorial logic.",
+    "Probability is just a measure assigned to these geometric regions. If the circle of 'Rain' covers 30% of our universe, and 'Wind' covers 40%, the logic of their overlap dictates how we prepare for the storm.",
+  ],
+  formula: "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)",
+};
 
 type Operation = "None" | "Union" | "Intersection" | "A_Only" | "B_Only" | "C_Only" | "AB_Only" | "BC_Only" | "AC_Only";
 
@@ -11,6 +25,7 @@ export const VennEngine = () => {
   const [pB, setPB] = useState(0.65);
   const [pC, setPC] = useState(0.60);
   const [op, setOp] = useState<Operation>("Union");
+  const [speechOpen, setSpeechOpen] = useState(false);
 
   const theoryItems = [
     { l: "Addition Rule (3 Sets)", v: "$P(A \\cup B \\cup C) = P(A) + P(B) + P(C) - (P(A \\cap B) + P(B \\cap C) + P(A \\cap C)) + P(A \\cap B \\cap C)$" },
@@ -26,16 +41,68 @@ export const VennEngine = () => {
     C: { x: 240, y: 210 }
   };
 
-  const getActiveFill = (id: Operation) => op === id ? "fill-secondary-gold/60" : "fill-transparent";
+  // Computed probability stats (using a fixed 30% mutual overlap assumption)
+  const overlapFactor = 0.30;
+  const pAB = useMemo(() => overlapFactor * Math.min(pA, pB), [pA, pB]);
+  const pBC = useMemo(() => overlapFactor * Math.min(pB, pC), [pB, pC]);
+  const pAC = useMemo(() => overlapFactor * Math.min(pA, pC), [pA, pC]);
+  const pABC = useMemo(() => overlapFactor * 0.5 * Math.min(pA, pB, pC), [pA, pB, pC]);
+  const pUnion = useMemo(() => {
+    return Math.min(1, pA + pB + pC - pAB - pBC - pAC + pABC);
+  }, [pA, pB, pC, pAB, pBC, pAC, pABC]);
+
+  const activeStatValue = useMemo(() => {
+    if (op === "Union")        return { label: "P(A ∪ B ∪ C)", value: pUnion };
+    if (op === "Intersection") return { label: "P(A ∩ B ∩ C)", value: pABC };
+    if (op === "A_Only")       return { label: "P(A only)",    value: Math.max(0, pA - pAB - pAC + pABC) };
+    if (op === "AB_Only")      return { label: "P(A ∩ B only)", value: Math.max(0, pAB - pABC) };
+    return { label: "—", value: 0 };
+  }, [op, pA, pB, pC, pAB, pBC, pAC, pABC, pUnion]);
 
   return (
     <SectionSection
       id="speaker1"
       speaker="1"
-      label="Fundamentals"
+      label={SPEAKER_1_SPEECH.topic}
       title="Triple Venn Dynamics"
-      formula={`P(A \\cup B \\cup C) = \\sum P(A_i) - \\sum P(A_i \\cap A_j) + P(A \\cap B \\cap C)`}
+      formula={SPEAKER_1_SPEECH.formula}
     >
+      {/* Speech Panel */}
+      <div className="mb-12">
+        <button
+          onClick={() => setSpeechOpen(!speechOpen)}
+          className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-4"
+        >
+          <span className={`transition-transform duration-300 ${speechOpen ? "rotate-90" : ""}`}>▶</span>
+          {SPEAKER_1_SPEECH.name} — "{SPEAKER_1_SPEECH.teaser.slice(0, 60)}…"
+        </button>
+        <AnimatePresence>
+          {speechOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <GlassCard className="p-8 border-l-4 border-secondary mb-6">
+                <p className="text-academic-muted text-sm italic font-serif leading-relaxed mb-6">
+                  "{SPEAKER_1_SPEECH.teaser}"
+                </p>
+                <div className="space-y-4">
+                  {SPEAKER_1_SPEECH.points.map((pt, i) => (
+                    <div key={i} className="flex gap-4">
+                      <span className="text-secondary font-bold font-mono text-xs mt-1 shrink-0">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <p className="text-sm leading-relaxed text-academic-muted">{pt}</p>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 mb-16">
         
         {/* Dark UI Simulation Container */}
@@ -132,6 +199,11 @@ export const VennEngine = () => {
                        <clipPath id="circleC"><circle cx={centers.C.x} cy={centers.C.y} r={pC * 100} /></clipPath>
                    </defs>
 
+                   {/* Upper-left Total Badge: P(A∪B∪C) */}
+                   <rect x="8" y="8" width="112" height="44" rx="8" fill="#1A1914" opacity="0.92" />
+                   <text x="18" y="22" fontSize="8" fontFamily="monospace" fontWeight="bold" fill="rgba(255,255,255,0.35)" letterSpacing="1">P(A∪B∪C) TOTAL</text>
+                   <text x="18" y="43" fontSize="21" fontFamily="monospace" fontWeight="bold" fill="#D4A017">{(pUnion * 100).toFixed(0)}%</text>
+
                    {/* Base Circles */}
                    <circle cx={centers.A.x} cy={centers.A.y} r={pA * 100} className="fill-white/5 stroke-white/20" strokeWidth={1} />
                    <circle cx={centers.B.x} cy={centers.B.y} r={pB * 100} className="fill-white/5 stroke-white/20" strokeWidth={1} />
@@ -178,16 +250,43 @@ export const VennEngine = () => {
                        </g>
                    )}
 
-                   {/* Outlines */}
-                   <circle cx={centers.A.x} cy={centers.A.y} r={pA * 100} className="fill-transparent stroke-secondary-gold/30" strokeWidth={2} />
-                   <circle cx={centers.B.x} cy={centers.B.y} r={pB * 100} className="fill-transparent stroke-blue-500/30" strokeWidth={2} />
-                   <circle cx={centers.C.x} cy={centers.C.y} r={pC * 100} className="fill-transparent stroke-emerald-500/30" strokeWidth={2} />
+                    {/* Outlines */}
+                    <circle cx={centers.A.x} cy={centers.A.y} r={pA * 100} className="fill-transparent stroke-secondary-gold/30" strokeWidth={2} />
+                    <circle cx={centers.B.x} cy={centers.B.y} r={pB * 100} className="fill-transparent stroke-blue-500/30" strokeWidth={2} />
+                    <circle cx={centers.C.x} cy={centers.C.y} r={pC * 100} className="fill-transparent stroke-emerald-500/30" strokeWidth={2} />
 
-                   {/* Labels */}
-                   <text x={centers.A.x} y={centers.A.y - pA * 50} className="text-3xl font-serif font-bold fill-white/80 text-center" textAnchor="middle">A</text>
-                   <text x={centers.B.x - pB * 50} y={centers.B.y + pB * 30} className="text-3xl font-serif font-bold fill-white/80 text-center" textAnchor="middle">B</text>
-                   <text x={centers.C.x + pC * 50} y={centers.C.y + pC * 30} className="text-3xl font-serif font-bold fill-white/80 text-center" textAnchor="middle">C</text>
-               </svg>
+                    {/* Letter Labels — pushed to outer edge of each circle */}
+                    <text x={centers.A.x} y={centers.A.y - pA * 90} fontSize="14" fontFamily="serif" fontWeight="bold" fill="rgba(255,255,255,0.7)" textAnchor="middle">A</text>
+                    <text x={centers.B.x - pB * 80} y={centers.B.y + pB * 70} fontSize="14" fontFamily="serif" fontWeight="bold" fill="rgba(255,255,255,0.7)" textAnchor="middle">B</text>
+                    <text x={centers.C.x + pC * 80} y={centers.C.y + pC * 70} fontSize="14" fontFamily="serif" fontWeight="bold" fill="rgba(255,255,255,0.7)" textAnchor="middle">C</text>
+
+                    {/* P(X) Percentage Labels — inside each circle */}
+                    <text x={centers.A.x} y={centers.A.y - pA * 35} fontSize="11" fontFamily="monospace" fontWeight="bold" fill="#D4A017" textAnchor="middle" opacity="0.9">
+                      {(pA * 100).toFixed(0)}%
+                    </text>
+                    <text x={centers.B.x - pB * 30} y={centers.B.y + pB * 55} fontSize="11" fontFamily="monospace" fontWeight="bold" fill="#60a5fa" textAnchor="middle" opacity="0.9">
+                      {(pB * 100).toFixed(0)}%
+                    </text>
+                    <text x={centers.C.x + pC * 30} y={centers.C.y + pC * 55} fontSize="11" fontFamily="monospace" fontWeight="bold" fill="#34d399" textAnchor="middle" opacity="0.9">
+                      {(pC * 100).toFixed(0)}%
+                    </text>
+                </svg>
+
+                {/* Live Stats Row */}
+                <div className="absolute bottom-0 left-0 right-0 bg-[#1A1914]/90 backdrop-blur px-4 py-3 flex justify-around text-[10px] font-mono border-t border-white/5">
+                  {[
+                    { label: "P(A∩B)",     value: pAB },
+                    { label: "P(B∩C)",     value: pBC },
+                    { label: "P(A∩C)",     value: pAC },
+                    { label: "P(A∩B∩C)",   value: pABC },
+                    { label: "P(A∪B∪C)",   value: pUnion },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex flex-col items-center gap-1">
+                      <span className="text-white/30 text-[9px] uppercase">{label}</span>
+                      <span className="text-secondary-gold font-bold text-xs">{(value * 100).toFixed(0)}%</span>
+                    </div>
+                  ))}
+                </div>
            </div>
         </div>
 

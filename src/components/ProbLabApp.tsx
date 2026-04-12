@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { VennEngine } from "./simulations/VennEngine";
-import { CoinEngine } from "./simulations/CoinEngine";
-import { DiceEngine } from "./simulations/DiceEngine";
-import { CardEngine } from "./simulations/CardEngine";
-import { AIEngine } from "./simulations/AIEngine";
+import { ProbabilitySlider } from "./simulations/ProbabilitySlider";
+import { VennEngine }       from "./simulations/VennEngine";
+import { RealWorldEngine }  from "./simulations/RealWorldEngine";
+import { TechEngine }       from "./simulations/TechEngine";
+import { LotteryEngine }    from "./simulations/LotteryEngine";
+import { AIEngine }         from "./simulations/AIEngine";
 
 export const ProbLabApp = () => {
   const [mounted, setMounted] = useState(false);
@@ -24,10 +25,11 @@ export const ProbLabApp = () => {
 
   return (
     <>
+      <ProbabilitySlider />
       <VennEngine />
-      <CoinEngine />
-      <DiceEngine />
-      <CardEngine />
+      <RealWorldEngine />
+      <TechEngine />
+      <LotteryEngine />
       <AIEngine />
     </>
   );

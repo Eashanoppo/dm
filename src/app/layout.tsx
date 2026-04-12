@@ -16,8 +16,8 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "ProbLab — Probability from Coins to AI",
-  description: "High-fidelity interactive probability education platform built on Next.js 16. Explore Venn diagrams, Bernoulli trials, Dice analytics, and Bayes Theorem.",
+  title: "ProbLab — Probability in the Real World",
+  description: "High-fidelity interactive probability education platform. Explore weather forecasting, medical Bayes paradox, Monte Carlo traffic routing, Naïve Bayes spam filters, lottery odds, and AI text prediction — all backed by real mathematics.",
 };
 
 export default function RootLayout({

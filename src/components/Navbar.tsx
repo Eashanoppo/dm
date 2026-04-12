@@ -17,7 +17,7 @@ export const Navbar = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
 
-      const sections = ["hero", "speaker1", "speaker2", "speaker3", "speaker4", "speaker5"];
+      const sections = ["hero", "sim-slider", "speaker1", "sim-realworld", "sim-tech", "sim-lottery", "speaker5"];
       const scrollPos = window.scrollY + 100;
 
       for (const section of sections) {
@@ -34,12 +34,13 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { id: "hero", label: "Home" },
-    { id: "speaker1", label: "Fundamentals" },
-    { id: "speaker2", label: "Coins" },
-    { id: "speaker3", label: "Dice" },
-    { id: "speaker4", label: "Cards" },
-    { id: "speaker5", label: "AI" },
+    { id: "hero",          label: "Home" },
+    { id: "sim-slider",    label: "Intro" },
+    { id: "speaker1",      label: "Fundamentals" },
+    { id: "sim-realworld", label: "Real World" },
+    { id: "sim-tech",      label: "Tech & AI" },
+    { id: "sim-lottery",   label: "Lottery & Quiz" },
+    { id: "speaker5",      label: "AI Engine" },
   ];
 
   return (

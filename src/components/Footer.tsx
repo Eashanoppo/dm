@@ -23,11 +23,12 @@ export const Footer = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {[
-                  { focus: "Fundamentals", hook: "The Logic of Overlap" },
-                  { focus: "Coins", hook: "The Binary Foundations of Software" },
-                  { focus: "Dice", hook: "Patterns Emerging from Randomness" },
-                  { focus: "Cards", hook: "Conditional Complexity" },
-                  { focus: "AI", hook: "Decision Making Under Uncertainty" },
+                  { focus: "Probability Intro",  hook: "The Language of Randomness (0 to 1)" },
+                  { focus: "Fundamentals",        hook: "Set Theory & The Logic of Overlap" },
+                  { focus: "Real World",          hook: "Weather · Medical Diagnosis · Insurance" },
+                  { focus: "Tech & AI",           hook: "Monte Carlo Routing · Naïve Bayes Filter" },
+                  { focus: "Lottery & Quiz",      hook: "Gambler's Fallacy & Bayesian Quiz" },
+                  { focus: "AI Engine",           hook: "argmax P(output | input) at Scale" },
                 ].map((row, i) => (
                   <tr key={i} className="hover:bg-white/5 transition-colors">
                     <td className="p-4 text-sm font-medium">{row.focus}</td>

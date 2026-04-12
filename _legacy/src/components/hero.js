@@ -32,7 +32,7 @@ export const renderHero = () => {
                 <div class="preview-card" data-target="speaker4">
                     <span class="preview-icon">K</span>
                     <h4>Cards</h4>
-                    <p>Conditional complexity.</p>
+                    <p>Conditional Probability.</p>
                 </div>
                 <div class="preview-card" data-target="speaker5">
                     <span class="preview-icon">A</span>
@@ -154,7 +154,7 @@ export const initHeroLogic = () => {
     const updateFormula = () => {
         currentIndex = (currentIndex + 1) % formulas.length;
         formulaEl.style.opacity = '0';
-        
+
         setTimeout(() => {
             formulaEl.innerHTML = formulas[currentIndex];
             if (window.katex) {
