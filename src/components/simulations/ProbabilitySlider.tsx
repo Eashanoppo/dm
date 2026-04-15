@@ -49,7 +49,6 @@ export const SPEAKER_1_SPEECH = {
 export const ProbabilitySlider = () => {
   const [prob, setProb] = useState(50);
   const [mounted, setMounted] = useState(false);
-  const [speechOpen, setSpeechOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const info = getLabel(prob);
@@ -70,43 +69,6 @@ export const ProbabilitySlider = () => {
       title="Feel The Randomness"
       formula={SPEAKER_1_SPEECH.formula}
     >
-      {/* Speech Panel */}
-      <div className="mb-12">
-        <button
-          onClick={() => setSpeechOpen(!speechOpen)}
-          className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-4"
-        >
-          <span className={`transition-transform duration-300 ${speechOpen ? "rotate-90" : ""}`}>▶</span>
-          {SPEAKER_1_SPEECH.name} — "{SPEAKER_1_SPEECH.teaser.slice(0, 60)}…"
-        </button>
-        <AnimatePresence>
-          {speechOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <GlassCard className="p-8 border-l-4 border-secondary mb-6">
-                <p className="text-academic-muted text-sm italic font-serif leading-relaxed mb-6">
-                  "{SPEAKER_1_SPEECH.teaser}"
-                </p>
-                <div className="space-y-4">
-                  {SPEAKER_1_SPEECH.points.map((pt, i) => (
-                    <div key={i} className="flex gap-4">
-                      <span className="text-secondary font-bold font-mono text-xs mt-1 shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="text-sm leading-relaxed text-academic-muted">{pt}</p>
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         {/* LEFT — Quick-pick examples */}
         <div className="flex flex-col justify-center space-y-8">

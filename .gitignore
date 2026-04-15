@@ -3,7 +3,8 @@ node_modules/
 .pnp
 .pnp.js
 math/
-.stitch/
+.stitch
+
 # Testing
 coverage
 

@@ -25,7 +25,6 @@ export const VennEngine = () => {
   const [pB, setPB] = useState(0.65);
   const [pC, setPC] = useState(0.60);
   const [op, setOp] = useState<Operation>("Union");
-  const [speechOpen, setSpeechOpen] = useState(false);
 
   const theoryItems = [
     { l: "Addition Rule (3 Sets)", v: "$P(A \\cup B \\cup C) = P(A) + P(B) + P(C) - (P(A \\cap B) + P(B \\cap C) + P(A \\cap C)) + P(A \\cap B \\cap C)$" },
@@ -34,7 +33,6 @@ export const VennEngine = () => {
     { l: "Perfect Symmetry", v: "In a 3-set system, there are 7 distinct intersection regions + the outer space." }
   ];
 
-  // Circle positions (Equilateral triangle centers)
   const centers = {
     A: { x: 200, y: 130 },
     B: { x: 160, y: 210 },
@@ -67,42 +65,6 @@ export const VennEngine = () => {
       title="Triple Venn Dynamics"
       formula={SPEAKER_1_SPEECH.formula}
     >
-      {/* Speech Panel */}
-      <div className="mb-12">
-        <button
-          onClick={() => setSpeechOpen(!speechOpen)}
-          className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-4"
-        >
-          <span className={`transition-transform duration-300 ${speechOpen ? "rotate-90" : ""}`}>▶</span>
-          {SPEAKER_1_SPEECH.name} — "{SPEAKER_1_SPEECH.teaser.slice(0, 60)}…"
-        </button>
-        <AnimatePresence>
-          {speechOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <GlassCard className="p-8 border-l-4 border-secondary mb-6">
-                <p className="text-academic-muted text-sm italic font-serif leading-relaxed mb-6">
-                  "{SPEAKER_1_SPEECH.teaser}"
-                </p>
-                <div className="space-y-4">
-                  {SPEAKER_1_SPEECH.points.map((pt, i) => (
-                    <div key={i} className="flex gap-4">
-                      <span className="text-secondary font-bold font-mono text-xs mt-1 shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <p className="text-sm leading-relaxed text-academic-muted">{pt}</p>
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-12 mb-16">
         
         {/* Dark UI Simulation Container */}
