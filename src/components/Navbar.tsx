@@ -34,13 +34,13 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { id: "hero",          label: "Home" },
-    { id: "sim-slider",    label: "Intro" },
-    { id: "speaker1",      label: "Fundamentals" },
+    { id: "hero", label: "Home" },
+    { id: "sim-slider", label: "Intro" },
+    { id: "speaker1", label: "Fundamentals" },
     { id: "sim-realworld", label: "Real World" },
-    { id: "sim-tech",      label: "Tech & AI" },
-    { id: "sim-lottery",   label: "Lottery & Quiz" },
-    { id: "speaker5",      label: "AI Engine" },
+    { id: "sim-tech", label: "Tech & AI" },
+    { id: "sim-lottery", label: "Lottery  " },
+    { id: "speaker5", label: "AI Engine" },
   ];
 
   return (
@@ -73,9 +73,9 @@ export const Navbar = () => {
         </ul>
 
         <div className="hidden lg:block">
-           <button className="px-6 py-2 border border-academic-border rounded-full text-xs font-bold uppercase tracking-widest hover:bg-academic-text hover:text-white transition-all">
-              Research Tool
-           </button>
+          <button className="px-6 py-2 border border-academic-border rounded-full text-xs font-bold uppercase tracking-widest hover:bg-academic-text hover:text-white transition-all">
+            Research Tool
+          </button>
         </div>
       </div>
     </nav>
